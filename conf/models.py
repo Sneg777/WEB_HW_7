@@ -1,43 +1,46 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy.ext.hybrid import hybrid_property
 
 Base = declarative_base()
 
 
-class Groups(Base):
+class Group(Base):
     __tablename__ = 'groups'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    students = relationship('Students', back_populates='group')
+    name = Column(String(120), nullable=False)
+    students = relationship('Student', back_populates='group')
 
 
-class Teachers(Base):
+class Teacher(Base):
     __tablename__ = 'teachers'
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(50), nullable=False)
+    fullname = Column(String(120), nullable=False)
+    subjects = relationship('Subject', back_populates='teacher')
 
 
-class Students(Base):
+class Student(Base):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(50), nullable=False)
-    group = relationship('Groups', back_populates='students')
+    first_name = Column(String(120), nullable=False)
+    last_name = Column(String(120), nullable=False)
+    group_id = Column(Integer, ForeignKey('groups.id'))
+    group = relationship('Group', back_populates='students')
 
 
-class Subjects(Base):
+class Subject(Base):
     __tablename__ = 'subjects'
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    teacher_id = relationship('Teachers', secondary='teacher_subjects', back_populates='subjects')
+    teacher_id = Column(Integer, ForeignKey('teachers.id', ondelete='CASCADE'))
+    teacher = relationship('Teacher', back_populates='subjects')
 
 
-class Grades(Base):
+class Grade(Base):
     __tablename__ = 'grades'
     id = Column(Integer, primary_key=True)
-    student_id = Column(Integer, ForeignKey('students.id'), nullable=False)
-    subject_id = Column(Integer, ForeignKey('subjects.id'), nullable=False)
     grade = Column(Integer, nullable=False)
-    grade_date =
+    grade_date = Column(Date, nullable=False)
+    student_id = Column(Integer, ForeignKey('students.id', ondelete='CASCADE'))
+    subject_id = Column(Integer, ForeignKey('subjects.id', ondelete='CASCADE'))
+    student = relationship('Student', backref='grades')
+    subject = relationship('Subject', backref='grades')
