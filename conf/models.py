@@ -21,8 +21,7 @@ class Teacher(Base):
 class Student(Base):
     __tablename__ = 'students'
     id = Column(Integer, primary_key=True)
-    first_name = Column(String(120), nullable=False)
-    last_name = Column(String(120), nullable=False)
+    fullname = Column(String(120), nullable=False)
     group_id = Column(Integer, ForeignKey('groups.id'))
     group = relationship('Group', back_populates='students')
 
